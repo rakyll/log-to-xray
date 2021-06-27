@@ -1,8 +1,6 @@
 package main
 
 import (
-	"encoding/json"
-	"fmt"
 	"log"
 	"os"
 
@@ -10,12 +8,8 @@ import (
 )
 
 func main() {
-	decoder := json.NewDecoder(os.Stdin)
-	var span logtoxray.Span
-	for {
-		if err := decoder.Decode(&span); err != nil {
-			log.Fatal(err)
-		}
-		fmt.Println("----", span)
+	c := logtoxray.NewConsumer()
+	if err := c.Start(os.Stdin); err != nil {
+		log.Fatal(err)
 	}
 }
