@@ -66,21 +66,17 @@ func (c *Consumer) handleSpan(s *Span) {
 	}
 
 	key := s.Key()
-	switch {
-	case s.StartTime != time.Time{}:
+	if (s.StartTime != time.Time{}) {
 		c.buffer[key] = s
-	case s.EndTime != time.Time{}:
+	} else {
 		prev, ok := c.buffer[key]
 		if ok {
 			prev.Merge(s)
 		}
+	}
+	if (s.EndTime != time.Time{}) {
 		c.send(s)
 		delete(c.buffer, key)
-	default:
-		prev, ok := c.buffer[key]
-		if ok {
-			prev.Merge(s)
-		}
 	}
 }
 
