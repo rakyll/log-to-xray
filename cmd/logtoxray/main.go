@@ -8,7 +8,10 @@ import (
 )
 
 func main() {
-	c := logtoxray.NewConsumer()
+	c, err := logtoxray.NewConsumer()
+	if err != nil {
+		log.Fatal(err)
+	}
 	if err := c.Start(os.Stdin); err != nil {
 		log.Fatal(err)
 	}

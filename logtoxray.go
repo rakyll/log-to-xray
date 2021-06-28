@@ -1,11 +1,15 @@
 package logtoxray
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
 	"log"
 	"time"
+
+	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/service/xray"
 )
 
 type Span struct {
@@ -32,13 +36,19 @@ func (s *Span) Merge(s2 *Span) {
 }
 
 type Consumer struct {
-	buffer map[string]*Span
+	buffer     map[string]*Span
+	xrayClient *xray.Client
 }
 
-func NewConsumer() *Consumer {
-	return &Consumer{
-		buffer: make(map[string]*Span, 1000),
+func NewConsumer() (*Consumer, error) {
+	awsConfig, err := config.LoadDefaultConfig(context.Background())
+	if err != nil {
+		return nil, err
 	}
+	return &Consumer{
+		xrayClient: xray.NewFromConfig(awsConfig),
+		buffer:     make(map[string]*Span, 1000),
+	}, nil
 }
 
 func (c *Consumer) Start(r io.Reader) error {
@@ -81,5 +91,6 @@ func (c *Consumer) handleSpan(s *Span) {
 }
 
 func (c *Consumer) send(s *Span) {
+	// TODO(jbd): Implement.
 	fmt.Println(s)
 }
