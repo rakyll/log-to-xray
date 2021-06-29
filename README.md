@@ -30,7 +30,7 @@ are immutable.
 {
     "trace_id": "...",
     "span_id": "...",
-    "attributes": {
+    "attrs": {
         "service": "auth",
         "region": "us-east-1"
     }
