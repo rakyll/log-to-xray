@@ -6,6 +6,13 @@ tracing instrumenation library required.
 logtoxray processes aggregates log entries to
 create X-Ray segments.
 
+## Installation
+
+```
+$ go get github.com/rakyll/log-to-xray/cmd/logtoxray
+$ my_program | logtoxray
+```
+
 ## Usage
 
 Users should include trace_id and span_id in every entry.
