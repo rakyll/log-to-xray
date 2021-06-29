@@ -101,12 +101,17 @@ func (c *Consumer) send(s *Segment) {
 		return
 	}
 
-	if _, err := c.xrayClient.PutTraceSegments(context.Background(), &xray.PutTraceSegmentsInput{
+	out, err := c.xrayClient.PutTraceSegments(context.Background(), &xray.PutTraceSegmentsInput{
 		TraceSegmentDocuments: []string{string(doc)},
-	}); err != nil {
+	})
+	if err != nil {
 		log.Printf("Failed sending segment: %v", err)
 		return
 	}
 
-	log.Printf("Segment sent %q", s.Key())
+	if len(out.UnprocessedTraceSegments) > 0 {
+		for _, unprocessed := range out.UnprocessedTraceSegments {
+			log.Printf("Error processing segment=%q, error=%q", *unprocessed.Id, *unprocessed.Message)
+		}
+	}
 }
