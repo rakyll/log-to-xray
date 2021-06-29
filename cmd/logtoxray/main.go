@@ -16,3 +16,5 @@ func main() {
 		log.Fatal(err)
 	}
 }
+
+// TODO(jbd): Allow non-default region, non-default group.
