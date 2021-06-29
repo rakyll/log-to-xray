@@ -21,8 +21,8 @@ with start_time.
 
 ```
 {
-    "trace_id": "...",
-    "segment_id": "...",
+    "trace_id": "1-581cf771-a006649127e371903a2de979",
+    "id": "70de5b6f19ff9a0b",
     "name": "auth.CurrentUser",
     "start_time": "2021-06-28 17:09:12.0 -0700 PDT"
 }
@@ -34,8 +34,8 @@ are immutable.
 
 ```
 {
-    "trace_id": "...",
-    "segment_id": "...",
+    "trace_id": "1-581cf771-a006649127e371903a2de979",
+    "id": "70de5b6f19ff9a0b",
     "annotations": {
         "service": "auth",
         "region": "us-east-1"
@@ -48,8 +48,8 @@ with end_time:
 
 ```
 {
-    "trace_id": "...",
-    "segment_id": "...",
+    "trace_id": "1-581cf771-a006649127e371903a2de979",
+    "id": "70de5b6f19ff9a0b",
     "end_time": "2021-06-28 17:10:26.086625 -0700 PDT"
 }
 ```

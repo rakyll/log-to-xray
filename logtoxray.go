@@ -3,7 +3,6 @@ package logtoxray
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"io"
 	"log"
 	"time"
@@ -13,11 +12,11 @@ import (
 )
 
 type Segment struct {
-	ID          string            `json:"segment_id,omitempty"`
+	ID          string            `json:"id,omitempty"`
 	TraceID     string            `json:"trace_id,omitempty"`
 	Name        string            `json:"name,omitempty"`
-	StartTime   time.Time         `json:"start_time,omitempty"`
-	EndTime     time.Time         `json:"end_time,omitempty"`
+	StartTime   float64           `json:"start_time,omitempty"`
+	EndTime     float64           `json:"end_time,omitempty"`
 	Annotations map[string]string `json:"annotations,omitempty"`
 }
 
@@ -74,12 +73,12 @@ func (c *Consumer) Start(r io.Reader) error {
 
 func (c *Consumer) handleSpan(s *Segment) {
 	if s.TraceID == "" || s.ID == "" {
-		log.Printf("Invalid entry; trace_id=%q, span_id=%q", s.TraceID, s.ID)
+		log.Printf("Invalid entry; trace_id=%q, id=%q", s.TraceID, s.ID)
 		return
 	}
 
 	key := s.Key()
-	if (s.StartTime != time.Time{}) {
+	if s.StartTime > 0 {
 		c.buffer[key] = s
 	} else {
 		prev, ok := c.buffer[key]
@@ -87,13 +86,27 @@ func (c *Consumer) handleSpan(s *Segment) {
 			prev.Merge(s)
 		}
 	}
-	if (s.EndTime != time.Time{}) {
+	if s.EndTime > 0 {
 		c.send(s)
 		delete(c.buffer, key)
 	}
 }
 
 func (c *Consumer) send(s *Segment) {
-	// TODO(jbd): Implement.
-	fmt.Println(s)
+	log.Printf("Sending segment %q", s.Key())
+	// TODO(jbd): Buffer and send them non-blocking.
+	doc, err := json.Marshal(s)
+	if err != nil {
+		log.Printf("Failed marshaling segment document: %v", err)
+		return
+	}
+
+	if _, err := c.xrayClient.PutTraceSegments(context.Background(), &xray.PutTraceSegmentsInput{
+		TraceSegmentDocuments: []string{string(doc)},
+	}); err != nil {
+		log.Printf("Failed sending segment: %v", err)
+		return
+	}
+
+	log.Printf("Segment sent %q", s.Key())
 }
