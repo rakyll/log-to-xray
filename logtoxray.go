@@ -12,31 +12,34 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/xray"
 )
 
-type Span struct {
-	TraceID    string            `json:"trace_id,omitempty"`
-	SpanID     string            `json:"span_id,omitempty"`
-	Name       string            `json:"name,omitempty"`
-	StartTime  time.Time         `json:"start_time,omitempty"`
-	EndTime    time.Time         `json:"end_time,omitempty"`
-	Attributes map[string]string `json:"attrs,omitempty"`
+type Segment struct {
+	ID          string            `json:"segment_id,omitempty"`
+	TraceID     string            `json:"trace_id,omitempty"`
+	Name        string            `json:"name,omitempty"`
+	StartTime   time.Time         `json:"start_time,omitempty"`
+	EndTime     time.Time         `json:"end_time,omitempty"`
+	Annotations map[string]string `json:"annotations,omitempty"`
 }
 
-func (s *Span) Key() string {
-	return s.TraceID + "-" + s.SpanID
+// TODO(jbd): Use epoc for start and end time.
+// Segment should support X-Ray header directly.
+
+func (s *Segment) Key() string {
+	return s.TraceID + "-" + s.ID
 }
 
-func (s *Span) Merge(s2 *Span) {
+func (s *Segment) Merge(s2 *Segment) {
 	// TraceID, SpanID, StartTime and EndTime are not mutable.
 	if s2.Name != "" {
 		s.Name = s2.Name
 	}
-	for k, v := range s2.Attributes {
-		s.Attributes[k] = v
+	for k, v := range s2.Annotations {
+		s.Annotations[k] = v
 	}
 }
 
 type Consumer struct {
-	buffer     map[string]*Span
+	buffer     map[string]*Segment
 	xrayClient *xray.Client
 }
 
@@ -47,13 +50,13 @@ func NewConsumer() (*Consumer, error) {
 	}
 	return &Consumer{
 		xrayClient: xray.NewFromConfig(awsConfig),
-		buffer:     make(map[string]*Span, 1000),
+		buffer:     make(map[string]*Segment, 1000),
 	}, nil
 }
 
 func (c *Consumer) Start(r io.Reader) error {
 	decoder := json.NewDecoder(r)
-	var span Span
+	var span Segment
 
 	for {
 		err := decoder.Decode(&span)
@@ -69,9 +72,9 @@ func (c *Consumer) Start(r io.Reader) error {
 	}
 }
 
-func (c *Consumer) handleSpan(s *Span) {
-	if s.TraceID == "" || s.SpanID == "" {
-		log.Printf("Invalid entry; trace_id=%q, span_id=%q", s.TraceID, s.SpanID)
+func (c *Consumer) handleSpan(s *Segment) {
+	if s.TraceID == "" || s.ID == "" {
+		log.Printf("Invalid entry; trace_id=%q, span_id=%q", s.TraceID, s.ID)
 		return
 	}
 
@@ -90,7 +93,7 @@ func (c *Consumer) handleSpan(s *Span) {
 	}
 }
 
-func (c *Consumer) send(s *Span) {
+func (c *Consumer) send(s *Segment) {
 	// TODO(jbd): Implement.
 	fmt.Println(s)
 }

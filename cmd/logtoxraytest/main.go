@@ -10,12 +10,12 @@ import (
 
 func main() {
 	for {
-		logSpan(logtoxray.Span{
+		logSegment(logtoxray.Segment{
 			TraceID:   "122435353",
-			SpanID:    "45666",
+			ID:        "45666",
 			StartTime: time.Now(),
 			EndTime:   time.Now(),
-			Attributes: map[string]string{
+			Annotations: map[string]string{
 				"key": "value",
 			},
 		})
@@ -23,7 +23,7 @@ func main() {
 	}
 }
 
-func logSpan(span logtoxray.Span) {
-	entry, _ := json.Marshal(span)
+func logSegment(s logtoxray.Segment) {
+	entry, _ := json.Marshal(s)
 	fmt.Printf("%s\n", entry)
 }

@@ -22,7 +22,7 @@ with start_time.
 ```
 {
     "trace_id": "...",
-    "span_id": "...",
+    "segment_id": "...",
     "name": "auth.CurrentUser",
     "start_time": "2021-06-28 17:09:12.0 -0700 PDT"
 }
@@ -35,8 +35,8 @@ are immutable.
 ```
 {
     "trace_id": "...",
-    "span_id": "...",
-    "attrs": {
+    "segment_id": "...",
+    "annotations": {
         "service": "auth",
         "region": "us-east-1"
     }
@@ -49,7 +49,7 @@ with end_time:
 ```
 {
     "trace_id": "...",
-    "span_id": "...",
+    "segment_id": "...",
     "end_time": "2021-06-28 17:10:26.086625 -0700 PDT"
 }
 ```
