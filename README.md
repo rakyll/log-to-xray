@@ -3,9 +3,6 @@
 Write to logs, get X-Ray traces. No distributed
 tracing instrumenation library required.
 
-logtoxray processes aggregates log entries to
-create X-Ray segments.
-
 🚧 🚧 🚧 THIS PROJECT IS A WORK-IN-PROGRESS PROTOTYPE.
 
 ## Installation
